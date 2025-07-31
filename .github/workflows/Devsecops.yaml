@@ -10,10 +10,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
-
     # ---------- SNYK Security Scan ----------
     - name: Run Snyk Security Scan
       uses: snyk/actions/python@master
