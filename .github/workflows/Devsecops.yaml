@@ -1,0 +1,37 @@
+name: DevSecOps Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    # ---------- SNYK Security Scan ----------
+    - name: Run Snyk Security Scan
+      uses: snyk/actions/python@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+    # ---------- SonarQube Scan ----------
+    - name: SonarQube Scan
+      uses: sonarsource/sonarcloud-github-action@master
+      with:
+        projectBaseDir: .
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    # ---------- Retire.js Scan for Frontend ----------
+    - name: Install Retire.js
+      run: |
+        npm install -g retire
+
+    - name: Scan HTML/JS for vulnerabilities
+      run: retire --outputformat json --outputpath retire-report.json || true
